@@ -1,6 +1,6 @@
 # 作业 02：Bomb Lab
 
-这是 CMU CS:APP3e Bomb Lab 的公开自学版本。目标是使用反汇编器和调试器分析 `bomb`，依次找出六个阶段要求的输入。仓库不包含答案或现成反汇编结果。
+这是 CMU CS:APP3e Bomb Lab 的公开自学版本。目标是使用反汇编器和调试器分析 `bomb`，依次找出六个阶段要求的输入。本次逆向得到的答案记录在 `answers.txt`，仓库不包含现成反汇编结果。
 
 ## 材料
 
@@ -65,10 +65,10 @@ objdump -d -M intel bomb > bomb.asm
 
 ## 保存进度
 
-在当前目录创建 `answers.txt`，每行保存一个已经确认的阶段输入：
+`answers.txt` 已纳入 Git，每行对应一个阶段的输入：
 
 ```sh
 ./bomb answers.txt
 ```
 
-程序读取完文件中的答案后会继续从标准输入读取。`answers.txt` 已被 Git 忽略，避免误提交答案。
+程序读取完文件中的答案后会继续从标准输入读取。
