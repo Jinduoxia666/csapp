@@ -11,6 +11,7 @@
 - `farm.c`：`rtarget` 中 gadget farm 的源代码。
 - `README.txt`：自学包原始文件说明。
 - `attacklab.pdf`：官方作业说明。
+- `attacklab-zh.pdf`：非官方中文翻译版，保留函数名、命令、汇编和字节编码。
 
 | 阶段 | 目标 | 任务 |
 | --- | --- | --- |
@@ -37,6 +38,7 @@ be8394b826199bddcdcddb79bf3a3a4233dc70e5a9a9637dff79ba2edb24b4b0  rtarget
 14d6b7418b827e31ff9087a9451c7ca34fec395dc9ea2947612dc719f18a350a  farm.c
 4d0a08538d98a35cbff5c3a56bd3f9c7f6435dd7104644faa700653f04774ed8  cookie.txt
 61d020b7240c15ed3bb7c711cca0ac87baeb48c418d59c6bc3513d0209a21d62  attacklab.pdf
+8f95f9085c02e1fb18dade5fee087e6be9f4015e3c1002c751442a17c8b79714  attacklab-zh.pdf
 ```
 
 ## 调试环境
@@ -81,4 +83,4 @@ objdump -d -M intel rtarget > rtarget.asm
 ./hex2raw < exploit.txt | ./ctarget -q
 ```
 
-建议先阅读 `attacklab.pdf`，然后从 Phase 1 开始。每个阶段单独保存攻击字符串和分析过程，确认成功后再进入下一阶段。
+建议先阅读 `attacklab-zh.pdf`，遇到术语或指令细节时对照 `attacklab.pdf`，然后从 Phase 1 开始。每个阶段单独保存攻击字符串和分析过程，确认成功后再进入下一阶段。
