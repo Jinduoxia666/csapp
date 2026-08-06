@@ -1,6 +1,6 @@
 # 作业 02：Bomb Lab
 
-这是 CMU CS:APP3e Bomb Lab 的公开自学版本。目标是使用反汇编器和调试器分析 `bomb`，依次找出六个阶段要求的输入。本次逆向得到的答案记录在 `answers.txt`，仓库不包含现成反汇编结果。
+这是 CMU CS:APP3e Bomb Lab 的公开自学版本。目标是使用反汇编器和调试器分析 `bomb`，依次找出六个阶段要求的输入。本次逆向得到的答案记录在 `answers.txt`。
 
 ## 材料
 
@@ -14,7 +14,7 @@
 - <http://csapp.cs.cmu.edu/3e/bomb.tar>
 - <https://csapp.cs.cmu.edu/3e/bomblab.pdf>
 
-本次获取时 CMU 下载主机拒绝连接，因此从公开的 [CSAPP Labs 镜像](https://github.com/Zhenye-Na/CSAPP-Labs)提取了同版 `bomb`、`bomb.c` 和 `bomblab.pdf`；未复制镜像中的答案、题解或反汇编文件。`bomb` 又与另一个独立的 [15-213 课程仓库](https://github.com/JasonQSY/CMU-15-213-ICS)逐字节交叉核对，结果一致。
+本次获取时 CMU 下载主机拒绝连接，因此从公开的 [CSAPP Labs 镜像](https://github.com/Zhenye-Na/CSAPP-Labs)提取了同版 `bomb`、`bomb.c` 和 `bomblab.pdf`。`bomb` 又与另一个独立的 [15-213 课程仓库](https://github.com/JasonQSY/CMU-15-213-ICS)逐字节交叉核对，结果一致。
 
 文件的 SHA-256：
 

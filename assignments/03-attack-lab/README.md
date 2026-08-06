@@ -1,6 +1,6 @@
 # 作业 03：Attack Lab
 
-这是 CMU CS:APP3e Attack Lab 的公开自学版本。目标是在授权的实验目标上完成 3 个代码注入攻击和 2 个返回导向编程（ROP）攻击，理解 x86-64 栈、调用约定、指令编码以及缓冲区溢出的防护机制。仓库不包含题解或现成反汇编结果。
+这是 CMU CS:APP3e Attack Lab 的公开自学版本。目标是在授权的实验目标上完成 3 个代码注入攻击和 2 个返回导向编程（ROP）攻击，理解 x86-64 栈、调用约定、指令编码以及缓冲区溢出的防护机制。
 
 ## 材料
 
@@ -27,7 +27,7 @@
 - <http://csapp.cs.cmu.edu/3e/target1.tar>
 - <https://csapp.cs.cmu.edu/3e/attacklab.pdf>
 
-本次获取时 CMU 自学包下载服务不可用，因此从公开的 [CSAPP Labs 镜像](https://github.com/Zhenye-Na/CSAPP-Labs)提取原始材料，并与另一个独立的 [15-213 课程仓库](https://github.com/JasonQSY/CMU-15-213-ICS)逐字节交叉核对。镜像中的题解、攻击字符串和现成反汇编均未复制。
+本次获取时 CMU 自学包下载服务不可用，因此从公开的 [CSAPP Labs 镜像](https://github.com/Zhenye-Na/CSAPP-Labs)提取原始材料，并与另一个独立的 [15-213 课程仓库](https://github.com/JasonQSY/CMU-15-213-ICS)逐字节交叉核对。
 
 核心文件的 SHA-256：
 
