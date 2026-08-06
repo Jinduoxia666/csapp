@@ -9,6 +9,7 @@
 | 01 | [Data Lab](assignments/01-data-lab/README.md) | 已完成 |
 | 02 | [Bomb Lab](assignments/02-bomb-lab/README.md) | 已完成 |
 | 03 | [Attack Lab](assignments/03-attack-lab/README.md) | 已完成 |
+| 04 | [Cache Lab](assignments/04-cache-lab/README.md) | 待做 |
 
 ## 运行测试
 
