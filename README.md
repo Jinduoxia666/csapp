@@ -7,8 +7,8 @@
 | 编号 | 作业 | 状态 |
 | --- | --- | --- |
 | 01 | [Data Lab](assignments/01-data-lab/README.md) | 已完成 |
-| 02 | [Bomb Lab](assignments/02-bomb-lab/README.md) | 进行中 |
-| 03 | [Attack Lab](assignments/03-attack-lab/README.md) | 进行中 |
+| 02 | [Bomb Lab](assignments/02-bomb-lab/README.md) | 已完成 |
+| 03 | [Attack Lab](assignments/03-attack-lab/README.md) | 已完成 |
 
 ## 运行测试
 
