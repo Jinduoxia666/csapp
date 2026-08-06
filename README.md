@@ -12,6 +12,7 @@
 | 04 | [Cache Lab](assignments/04-cache-lab/README.md) | 待做 |
 | 05 | [Shell Lab](assignments/05-shell-lab/README.md) | 待做 |
 | 06 | [Malloc Lab](assignments/06-malloc-lab/README.md) | 待做 |
+| 07 | [Proxy Lab](assignments/07-proxy-lab/README.md) | 待做 |
 
 ## 运行测试
 
