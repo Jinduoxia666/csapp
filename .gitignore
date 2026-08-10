@@ -1,3 +1,5 @@
 .DS_Store
 build/
 *.o
+*.dSYM/
+.csim_results
