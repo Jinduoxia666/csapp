@@ -1,6 +1,16 @@
 # 作业 04：Cache Lab
 
-状态：**进行中**
+状态：**已完成**（自动评分 53/53，风格分 7 分需人工评定）
+
+| 部分 | 结果 | 满分条件 |
+| --- | --- | --- |
+| Part A | 27/27，8 个用例全对 | — |
+| Part B 32×32 | 287 misses，8/8 | m < 300 |
+| Part B 64×64 | 1227 misses，8/8 | m < 1300 |
+| Part B 61×67 | 1928 misses，10/10 | m < 2000 |
+
+`csim -v` 的输出与 `csim-ref` 逐字节一致，已在 6 组参数（含 `-E 3`、`-E 8`、
+`-s 6` 等评分范围外的配置）上 `diff` 验证。
 
 这是 CMU CS:APP3e / 15-213 Fall 2015 Cache Lab 的自学版本，
 在 f15 课程顺序里紧接 Attack Lab 之后（f15 不含 Y86 架构实验）。
@@ -61,7 +71,25 @@ de37f176d21338c65fc5bd5eb163c06df97fda2a3f1d21f577e25247f80ba64b  cachelab-hando
 - `csim-ref`、`test-csim` 是 Linux x86-64 ELF，直接执行报 `exec format error`。
 - Part B 的评测依赖 `valgrind`。
 
-所以和 Attack Lab 一样，评测放到远端 Linux 机器上做（`ssh order`）。
+所以和 Attack Lab 一样，评测放到远端 Linux 机器上做：
+
+```sh
+ssh order
+cd /root/code/jinduoxia/cachelab
+```
+
+远端是 CentOS 8 x86-64，已装 `valgrind 3.17.0`（`dnf install valgrind`），
+Part A、Part B 的评测都验证过可以跑。
+
+本地改完代码后同步过去（`--delete` 会清掉远端多余文件，但排除项里的
+编译产物不受影响）：
+
+```sh
+rsync -a --delete --exclude 'lectures/' --exclude '.DS_Store' \
+  --exclude 'csim' --exclude '*.dSYM/' --exclude '.csim_results' \
+  --exclude 'trace.f*' --exclude '*-handin.tar' --exclude '*.o' \
+  ./ order:/root/code/jinduoxia/cachelab/
+```
 
 ## 工作流
 
