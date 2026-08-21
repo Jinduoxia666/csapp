@@ -19,21 +19,37 @@
 满分 90 分 = 16 个 trace × 5 分 + 风格 10 分（注释 5 分，检查**每个**系统调用
 的返回值 5 分）。
 
-先读 `shlab-zh.md`，遇到细节问题对照 `shlab.pdf`。
+先读 `docs/shlab-zh.md`，遇到细节问题对照 `docs/shlab.pdf`。
 
 ## 材料
 
-`shlab-handout.tar` 已解包到本目录：
+`shlab-handout.tar` 已解包到本目录，并按用途分成了几个子目录：
 
-- `tsh.c`：**要写的** shell（骨架已给，7 个函数体是空的）。
-- `tshref`：参考 shell 的可执行文件（Linux x86-64 二进制）。
-- `tshref.out`：参考 shell 在全部 16 个 trace 上的输出。
-- `sdriver.pl`：trace 驱动的 shell 驱动程序（Perl）。
-- `trace01.txt` … `trace16.txt`：16 个测试 trace，编号越大越复杂。
-- `myspin.c`、`mysplit.c`、`mystop.c`、`myint.c`：trace 调用的小测试程序。
-- `Makefile`、`README`：官方构建脚本与原始说明。
-- `shlab.pdf`：官方作业说明。
-- `shlab-zh.md`：中文说明，按官方 PDF 整理。
+```text
+05-shell-lab/
+├── README.md
+├── Makefile        # 官方构建脚本，路径已按新目录改过
+├── tsh.c           # 要写的 shell（骨架已给，7 个函数体是空的）
+├── docs/
+│   ├── shlab.pdf       # 官方作业说明
+│   ├── shlab-zh.md     # 中文说明，按官方 PDF 整理
+│   └── README          # 官方原始说明
+├── lectures/           # f15 对应两讲的 PDF 与中文笔记
+├── traces/
+│   ├── trace01.txt … trace16.txt   # 16 个测试 trace，编号越大越复杂
+│   └── tshref.out                  # 参考 shell 在全部 trace 上的输出
+└── tools/
+    ├── sdriver.pl      # trace 驱动的 shell 驱动程序（Perl）
+    ├── tshref          # 参考 shell（Linux x86-64 二进制）
+    └── myspin.c mysplit.c mystop.c myint.c   # trace 调用的小测试程序
+```
+
+只有 `tsh.c` 需要动。`make` 会把 `tools/` 下的四个小程序编译到当前目录
+（`./myspin` 等），因为 trace 文件里就是这么调用它们的。
+
+`Makefile` 相对官方版的改动：路径跟着新目录走；`test01`…`test16` /
+`rtest01`…`rtest16` 用模式规则代替了 32 条重复目标；另加 `test-all` /
+`rtest-all` 一次跑完 16 个 trace。
 
 来源与校验（2026-08-21 从 CMU 官方站点下载）：
 
@@ -60,12 +76,12 @@ ebabdfa2a3147996246b6950303b601c1e38b772fa34b191d4bc33383b0ed156  shlab.pdf
 
 - `make` 能干净编译出 `tsh`、`myspin`、`mysplit`、`mystop`、`myint`（`-Wall -O2` 无警告）。
 - `sdriver.pl` 在 macOS 自带的 Perl 上能跑，`make test01` 等可以用。
-- `tshref` 是 Linux x86-64 ELF，本地执行报 `exec format error`，所以 `make rtestNN`
-  只能在 Linux 上跑；本地只能对着 `tshref.out` 比。
+- `tools/tshref` 是 Linux x86-64 ELF，本地执行报 `exec format error`，所以 `make rtestNN`
+  只能在 Linux 上跑；本地只能对着 `traces/tshref.out` 比。
 - macOS 的 `/bin/echo` 不认 `-e`，也不解释 `\046`：trace 04–15 里
   `/bin/echo -e tsh> ./myspin 1 \046` 这类行，本地会原样打印
   `-e tsh> ./myspin 1 \046` 而不是 `tsh> ./myspin 1 &`。这只影响 trace 用来
-  回显命令的那几行，shell 本身的行为照测，但输出没法直接和 `tshref.out` diff。
+  回显命令的那几行，shell 本身的行为照测，但输出没法直接和 `traces/tshref.out` diff。
 
 所以和 Cache Lab 一样，评测放到远端 Linux 机器上做：
 
@@ -75,7 +91,7 @@ cd /root/code/jinduoxia/shlab
 ```
 
 远端是 CentOS 8 x86-64（gcc 8.5.0，perl 5.26.3），已经把 handout 同步过去，
-`./sdriver.pl -t trace04.txt -s ./tshref -a "-p"` 验证过可以跑。
+`make rtest04` 验证过可以跑。
 
 本地改完代码后同步过去：
 
@@ -106,12 +122,19 @@ tsh> jobs
 在远端一次跑完 16 个 trace 并和参考输出对比：
 
 ```sh
-for i in $(seq -w 1 16); do make test$i; done > mine.out 2>&1
-diff <(sed -E 's/\([0-9]+\)/(PID)/g' mine.out) \
-     <(sed -E 's/\([0-9]+\)/(PID)/g' tshref.out)
+norm() { grep -vE 'sdriver\.pl|make\[' | sed -E 's/\([0-9]+\)/(PID)/g'; }
+make test-all 2>&1 | norm > mine.out
+norm < traces/tshref.out > ref.out
+diff ref.out mine.out
 ```
 
-PID 每次都不一样，所以要先把 `(12345)` 规格化掉；`trace11`–`trace13` 里
-`/bin/ps` 的输出也每次不同，只需保证 `mysplit` 进程的状态一致。
+PID 每次都不一样，先规格化成 `(PID)`；`make` 回显的驱动命令行（`./tools/sdriver.pl …`）
+和 `tshref.out` 里记的路径不同，连同 CMU 当年录制时混进去的 `make[1]:` 一行一起滤掉。
 
-编译产物（`tsh`、`myspin`、`mysplit`、`mystop`、`myint`）已在 `.gitignore` 里忽略。
+剩下的差异应该只有 `trace11`–`trace13` 里 `/bin/ps a` 的输出——那是整台机器的进程表，
+必然不同，只需保证里面 `mysplit` 进程的状态和参考输出一致。这套流程已经用
+`make rtest-all`（拿参考 shell 自己跑一遍）在远端验证过：除 `ps` 的输出外与
+`traces/tshref.out` 完全一致。
+
+编译产物（`tsh`、`myspin`、`mysplit`、`mystop`、`myint`、`mine.out`、`ref.out`）
+已在 `.gitignore` 里忽略。

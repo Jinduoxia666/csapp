@@ -1,100 +1,55 @@
 # Makefile for the CS:APP Shell Lab
+#
+# 相对官方 handout 的改动：文件按用途分到了 docs/ traces/ tools/ 三个目录，
+# 这里的路径跟着改；test01..16 / rtest01..16 用模式规则代替 32 条重复目标，
+# 另加 test-all / rtest-all 一次跑完 16 个 trace。
+# 测试程序仍然编译到当前目录，因为 trace 里是按 ./myspin 这样调用的。
 
-TEAM = NOBODY
-VERSION = 1
-HANDINDIR = /afs/cs/academic/class/15213-f02/L5/handin
-DRIVER = ./sdriver.pl
-TSH = ./tsh
-TSHREF = ./tshref
-TSHARGS = "-p"
-CC = gcc
-CFLAGS = -Wall -O2
-FILES = $(TSH) ./myspin ./mysplit ./mystop ./myint
+TRACEDIR = traces
+TOOLDIR  = tools
+DRIVER   = ./$(TOOLDIR)/sdriver.pl
+TSH      = ./tsh
+TSHREF   = ./$(TOOLDIR)/tshref
+TSHARGS  = "-p"
+CC       = gcc
+CFLAGS   = -Wall -O2
+
+HELPERS  = ./myspin ./mysplit ./mystop ./myint
+FILES    = $(TSH) $(HELPERS)
+NUMS     = 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16
 
 all: $(FILES)
 
-##################
-# Handin your work
-##################
-handin:
-	cp tsh.c $(HANDINDIR)/$(TEAM)-$(VERSION)-tsh.c
+myspin: $(TOOLDIR)/myspin.c
+	$(CC) $(CFLAGS) -o $@ $<
+mysplit: $(TOOLDIR)/mysplit.c
+	$(CC) $(CFLAGS) -o $@ $<
+mystop: $(TOOLDIR)/mystop.c
+	$(CC) $(CFLAGS) -o $@ $<
+myint: $(TOOLDIR)/myint.c
+	$(CC) $(CFLAGS) -o $@ $<
 
 
 ##################
 # Regression tests
 ##################
 
-# Run tests using the student's shell program
-test01:
-	$(DRIVER) -t trace01.txt -s $(TSH) -a $(TSHARGS)
-test02:
-	$(DRIVER) -t trace02.txt -s $(TSH) -a $(TSHARGS)
-test03:
-	$(DRIVER) -t trace03.txt -s $(TSH) -a $(TSHARGS)
-test04:
-	$(DRIVER) -t trace04.txt -s $(TSH) -a $(TSHARGS)
-test05:
-	$(DRIVER) -t trace05.txt -s $(TSH) -a $(TSHARGS)
-test06:
-	$(DRIVER) -t trace06.txt -s $(TSH) -a $(TSHARGS)
-test07:
-	$(DRIVER) -t trace07.txt -s $(TSH) -a $(TSHARGS)
-test08:
-	$(DRIVER) -t trace08.txt -s $(TSH) -a $(TSHARGS)
-test09:
-	$(DRIVER) -t trace09.txt -s $(TSH) -a $(TSHARGS)
-test10:
-	$(DRIVER) -t trace10.txt -s $(TSH) -a $(TSHARGS)
-test11:
-	$(DRIVER) -t trace11.txt -s $(TSH) -a $(TSHARGS)
-test12:
-	$(DRIVER) -t trace12.txt -s $(TSH) -a $(TSHARGS)
-test13:
-	$(DRIVER) -t trace13.txt -s $(TSH) -a $(TSHARGS)
-test14:
-	$(DRIVER) -t trace14.txt -s $(TSH) -a $(TSHARGS)
-test15:
-	$(DRIVER) -t trace15.txt -s $(TSH) -a $(TSHARGS)
-test16:
-	$(DRIVER) -t trace16.txt -s $(TSH) -a $(TSHARGS)
+# 跑自己的 shell：make test01 … make test16
+test%: $(FILES)
+	$(DRIVER) -t $(TRACEDIR)/trace$*.txt -s $(TSH) -a $(TSHARGS)
 
-# Run the tests using the reference shell program
-rtest01:
-	$(DRIVER) -t trace01.txt -s $(TSHREF) -a $(TSHARGS)
-rtest02:
-	$(DRIVER) -t trace02.txt -s $(TSHREF) -a $(TSHARGS)
-rtest03:
-	$(DRIVER) -t trace03.txt -s $(TSHREF) -a $(TSHARGS)
-rtest04:
-	$(DRIVER) -t trace04.txt -s $(TSHREF) -a $(TSHARGS)
-rtest05:
-	$(DRIVER) -t trace05.txt -s $(TSHREF) -a $(TSHARGS)
-rtest06:
-	$(DRIVER) -t trace06.txt -s $(TSHREF) -a $(TSHARGS)
-rtest07:
-	$(DRIVER) -t trace07.txt -s $(TSHREF) -a $(TSHARGS)
-rtest08:
-	$(DRIVER) -t trace08.txt -s $(TSHREF) -a $(TSHARGS)
-rtest09:
-	$(DRIVER) -t trace09.txt -s $(TSHREF) -a $(TSHARGS)
-rtest10:
-	$(DRIVER) -t trace10.txt -s $(TSHREF) -a $(TSHARGS)
-rtest11:
-	$(DRIVER) -t trace11.txt -s $(TSHREF) -a $(TSHARGS)
-rtest12:
-	$(DRIVER) -t trace12.txt -s $(TSHREF) -a $(TSHARGS)
-rtest13:
-	$(DRIVER) -t trace13.txt -s $(TSHREF) -a $(TSHARGS)
-rtest14:
-	$(DRIVER) -t trace14.txt -s $(TSHREF) -a $(TSHARGS)
-rtest15:
-	$(DRIVER) -t trace15.txt -s $(TSHREF) -a $(TSHARGS)
-rtest16:
-	$(DRIVER) -t trace16.txt -s $(TSHREF) -a $(TSHARGS)
+# 跑参考 shell：make rtest01 … make rtest16（tshref 是 Linux x86-64 二进制）
+rtest%: $(HELPERS)
+	$(DRIVER) -t $(TRACEDIR)/trace$*.txt -s $(TSHREF) -a $(TSHARGS)
+
+# 一次跑完 16 个 trace
+test-all: $(addprefix test,$(NUMS))
+rtest-all: $(addprefix rtest,$(NUMS))
+
+.NOTPARALLEL:
+.PHONY: all clean test-all rtest-all
 
 
 # clean up
 clean:
 	rm -f $(FILES) *.o *~
-
-

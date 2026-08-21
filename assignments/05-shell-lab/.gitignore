@@ -5,3 +5,5 @@ mystop
 myint
 *.dSYM/
 *-tsh.c
+mine.out
+ref.out

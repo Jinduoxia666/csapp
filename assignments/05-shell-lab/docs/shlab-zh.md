@@ -29,24 +29,29 @@ tsh> [在这里输入命令]
 
 ## 2 材料清单
 
+> 官方 handout 的文件在本目录里按用途分到了 `docs/`、`traces/`、`tools/` 三个子目录，
+> `Makefile` 里的路径已经跟着改好，`make`、`make test01` 这类命令照常可用。
+> 下表第二列是本仓库里的实际位置。
+
+| 文件 | 位置 | 说明 |
+| --- | --- | --- |
+| `tsh.c` | `tsh.c` | **要写的** shell 程序 |
+| `Makefile` | `Makefile` | 编译 shell 并运行测试（路径已按新目录改过） |
+| `README` | `docs/README` | 官方原始说明 |
+| `tshref` | `tools/tshref` | 参考 shell 的可执行文件（Linux x86-64 二进制） |
+| `sdriver.pl` | `tools/sdriver.pl` | trace 驱动的 shell 驱动程序 |
+| `trace01.txt` … `trace16.txt` | `traces/` | 驱动 shell 的 16 个 trace 文件 |
+| `tshref.out` | `traces/tshref.out` | 参考 shell 在全部 trace 上的输出样例 |
+
+trace 文件会调用下面这几个小 C 程序（源码在 `tools/`，`make` 会把它们编译到当前目录，
+因为 trace 里是按 `./myspin` 这样调用的）：
+
 | 文件 | 说明 |
 | --- | --- |
-| `tsh.c` | **要写的** shell 程序 |
-| `Makefile` | 编译 shell 并运行测试 |
-| `README` | 官方原始说明 |
-| `tshref` | 参考 shell 的可执行文件（Linux x86-64 二进制） |
-| `sdriver.pl` | trace 驱动的 shell 驱动程序 |
-| `trace01.txt` … `trace16.txt` | 驱动 shell 的 16 个 trace 文件 |
-| `tshref.out` | 参考 shell 在全部 trace 上的输出样例 |
-
-trace 文件会调用下面这几个小 C 程序：
-
-| 文件 | 说明 |
-| --- | --- |
-| `myspin.c` | 接受参数 `<n>`，空转 `<n>` 秒 |
-| `mysplit.c` | fork 出一个子进程，子进程空转 `<n>` 秒 |
-| `mystop.c` | 空转 `<n>` 秒后给自己发 `SIGTSTP` |
-| `myint.c` | 空转 `<n>` 秒后给自己发 `SIGINT` |
+| `tools/myspin.c` | 接受参数 `<n>`，空转 `<n>` 秒 |
+| `tools/mysplit.c` | fork 出一个子进程，子进程空转 `<n>` 秒 |
+| `tools/mystop.c` | 空转 `<n>` 秒后给自己发 `SIGTSTP` |
+| `tools/myint.c` | 空转 `<n>` 秒后给自己发 `SIGINT` |
 
 ## 3 Unix shell 概述
 
@@ -134,10 +139,11 @@ Options:
   -g            Generate output for autograder
 ```
 
-用 `trace01.txt` 测自己的 shell：
+用 `trace01.txt` 测自己的 shell（原文写法在左，本目录分完目录后的实际路径在右）：
 
 ```sh
-unix> ./sdriver.pl -t trace01.txt -s ./tsh -a "-p"
+unix> ./sdriver.pl -t trace01.txt -s ./tsh -a "-p"              # 原文
+unix> ./tools/sdriver.pl -t traces/trace01.txt -s ./tsh -a "-p" # 本目录
 ```
 
 （`-a "-p"` 告诉你的 shell 不要打印提示符），等价于：
@@ -149,18 +155,18 @@ unix> make test01
 同样地，用参考 shell 跑同一个 trace 作对比：
 
 ```sh
-unix> ./sdriver.pl -t trace01.txt -s ./tshref -a "-p"
+unix> ./tools/sdriver.pl -t traces/trace01.txt -s ./tools/tshref -a "-p"
 # 或
 unix> make rtest01
 ```
 
-`tshref.out` 里已经给出了参考答案在全部 trace 上的输出，比自己逐个手动跑一遍方便。
+`traces/tshref.out` 里已经给出了参考答案在全部 trace 上的输出，比自己逐个手动跑一遍方便。
 
 trace 文件的好处是：它生成的输出，和你交互式地敲这些命令得到的输出是一样的（只多了开头一段标识 trace 的注释）。例如：
 
 ```text
 $ make test15
-./sdriver.pl -t trace15.txt -s ./tsh -a "-p"
+./tools/sdriver.pl -t traces/trace15.txt -s ./tsh -a "-p"
 #
 # trace15.txt - Putting it all together
 #
@@ -193,8 +199,8 @@ tsh> quit
 
 > `shlab.pdf` 里印的这段样例出自更早的版本（`Command not found.` 带句点、
 > `Job (9721)` 不带 JID、`Running` 后面补空格对齐），和本 handout 附带的
-> `tshref` 实际输出对不上。**以 `tshref.out` 为准**，上面这段就是从
-> `tshref.out` 抄来的。
+> `tshref` 实际输出对不上。**以 `traces/tshref.out` 为准**，上面这段就是从 `traces/tshref.out` 抄来的
+> （只有开头那行驱动命令按本目录的新路径改过）。
 
 ### 5.3 16 个 trace 一览
 
@@ -221,7 +227,7 @@ tsh> quit
 
 ### 5.4 参考 shell 的输出格式
 
-抄错一个字都会导致 diff 不一致，这几条消息照抄（来自 `tshref` 与 `tshref.out`）：
+抄错一个字都会导致 diff 不一致，这几条消息照抄（来自 `tools/tshref` 与 `traces/tshref.out`）：
 
 ```text
 %s: Command not found
@@ -264,4 +270,4 @@ Job [%d] (%d) stopped by signal %d
 评测在 Linux 机器上进行，用的就是本目录里的 shell 驱动和 trace 文件。你的 shell 在这些 trace 上的输出应当和参考 shell 一致，只有两处例外：
 
 - PID 会（也必然会）不同。
-- `trace11.txt`、`trace12.txt`、`trace13.txt` 里 `/bin/ps` 的输出每次运行都不一样。不过输出里 `mysplit` 进程的运行状态应当是一致的。
+- `traces/trace11.txt`、`traces/trace12.txt`、`traces/trace13.txt` 里 `/bin/ps` 的输出每次运行都不一样。不过输出里 `mysplit` 进程的运行状态应当是一致的。
