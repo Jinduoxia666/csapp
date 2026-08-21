@@ -1,0 +1,7 @@
+tsh
+myspin
+mysplit
+mystop
+myint
+*.dSYM/
+*-tsh.c
