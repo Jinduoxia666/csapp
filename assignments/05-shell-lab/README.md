@@ -22,6 +22,11 @@
 
 来源：<https://www.cs.cmu.edu/afs/cs/academic/class/15213-f15/www/lectures/>
 
+对应的中文笔记（按幻灯片顺序整理，末尾附与本 lab 的对照表）：
+
+- `lectures/14-ecf-procs-zh.md`
+- `lectures/15-ecf-signals-zh.md`
+
 ## 材料
 
 代码 handout 待获取。官方入口：
