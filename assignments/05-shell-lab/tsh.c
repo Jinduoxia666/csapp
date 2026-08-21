@@ -164,15 +164,56 @@ int main(int argc, char **argv)
 void eval(char *cmdline) 
 {
     char *argv[MAXARGS];       /* 传给 execve() 的参数列表 */
+    sigset_t mask_chld, prev;  /* 要阻塞的信号集，以及原来的信号掩码 */
+    pid_t pid;
+    int bg;                    /* 命令行以 & 结尾就是后台作业 */
 
-    parseline(cmdline, argv);
+    bg = parseline(cmdline, argv);
     if (argv[0] == NULL)       /* 空行直接忽略 */
         return;
 
     if (builtin_cmd(argv))     /* 内建命令在 shell 自己的进程里执行 */
         return;
 
-    /* TODO(trace03)：fork 子进程 → setpgid(0,0) → execve 运行程序 */
+    /* fork 之前先阻塞 SIGCHLD：否则子进程可能在父进程 addjob 之前就结束，
+     * sigchld_handler 抢先跑去删一个还没加进列表的作业，这个作业就永远留在
+     * 列表里了。等 addjob 做完再解除阻塞 */
+    if (sigemptyset(&mask_chld) < 0)
+        unix_error("sigemptyset error");
+    if (sigaddset(&mask_chld, SIGCHLD) < 0)
+        unix_error("sigaddset error");
+    if (sigprocmask(SIG_BLOCK, &mask_chld, &prev) < 0)
+        unix_error("sigprocmask error");
+
+    if ((pid = fork()) < 0)
+        unix_error("fork error");
+
+    if (pid == 0) {            /* 子进程 */
+        /* 子进程继承了父进程的阻塞集合，execve 之前必须自己解除 */
+        if (sigprocmask(SIG_SETMASK, &prev, NULL) < 0)
+            unix_error("sigprocmask error");
+
+        /* 把子进程放进一个以它自己 PID 为组 ID 的新进程组。这样前台进程组里
+         * 就只剩 shell 一个进程，敲 ctrl-c 时内核不会直接打到作业头上，
+         * 而是由 shell 捕获后再转发 */
+        if (setpgid(0, 0) < 0)
+            unix_error("setpgid error");
+
+        if (execve(argv[0], argv, environ) < 0) {
+            printf("%s: Command not found\n", argv[0]);
+            exit(1);
+        }
+    }
+
+    /* 父进程：先把作业记进列表，再放开 SIGCHLD */
+    addjob(jobs, pid, bg ? BG : FG, cmdline);
+    if (sigprocmask(SIG_SETMASK, &prev, NULL) < 0)
+        unix_error("sigprocmask error");
+
+    if (bg)                    /* 后台作业：报一下 jid/pid 就接着读下一条命令 */
+        printf("[%d] (%d) %s", pid2jid(pid), pid, cmdline);
+    else                       /* 前台作业：等它跑完 */
+        waitfg(pid);
 }
 
 /* 
@@ -256,7 +297,10 @@ void do_bgfg(char **argv)
  */
 void waitfg(pid_t pid)
 {
-    return;
+    /* 回收的活全交给 sigchld_handler，这里只是等它把作业从列表里删掉
+     * （或者改成停止状态）。sleep 会被送达的 SIGCHLD 打断，所以不会真睡满 1 秒 */
+    while (fgpid(jobs) == pid)
+        sleep(1);
 }
 
 /*****************
@@ -271,7 +315,35 @@ void waitfg(pid_t pid)
  */
 void sigchld_handler(int sig) 
 {
-    return;
+    int olderrno = errno;      /* handler 里改动 errno 会干扰主控制流 */
+    int status;
+    pid_t pid;
+    struct job_t *job;
+
+    /* WNOHANG：没有已经结束的子进程就立刻返回，不去等还在跑的那些
+     * WUNTRACED：子进程被停止（而不是终止）时也返回
+     * 一次 SIGCHLD 可能对应多个子进程状态变化，所以要用循环收干净 */
+    while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0) {
+        if (WIFSTOPPED(status)) {          /* 被信号停止：留在列表里，改状态 */
+            job = getjobpid(jobs, pid);
+            if (job != NULL)
+                job->state = ST;
+            printf("Job [%d] (%d) stopped by signal %d\n",
+                   pid2jid(pid), pid, WSTOPSIG(status));
+        }
+        else if (WIFSIGNALED(status)) {    /* 被未捕获的信号终止 */
+            printf("Job [%d] (%d) terminated by signal %d\n",
+                   pid2jid(pid), pid, WTERMSIG(status));
+            deletejob(jobs, pid);
+        }
+        else {                             /* 正常退出，安静地删掉 */
+            deletejob(jobs, pid);
+        }
+    }
+    if (pid < 0 && errno != ECHILD)        /* ECHILD 表示没有子进程了，正常 */
+        unix_error("waitpid error");
+
+    errno = olderrno;
 }
 
 /* 
