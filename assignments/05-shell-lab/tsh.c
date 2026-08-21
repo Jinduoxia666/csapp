@@ -281,6 +281,11 @@ int builtin_cmd(char **argv)
     if (!strcmp(argv[0], "quit"))  /* quit：直接结束 shell */
         exit(0);
 
+    if (!strcmp(argv[0], "jobs")) {  /* jobs：列出所有后台作业 */
+        listjobs(jobs);
+        return 1;
+    }
+
     return 0;     /* 不是内建命令 */
 }
 
