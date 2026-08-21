@@ -1,6 +1,15 @@
 # 作业 05：Shell Lab
 
-状态：**待做**（handout 已就位，`tsh.c` 还没写）
+状态：**已完成**（16 个 trace 全部通过，正确性 80/80；风格分 10 分需人工评定）
+
+| 项目 | 结果 |
+| --- | --- |
+| trace01–10 | 输出与 `traces/tshref.out` 逐字节一致 |
+| trace11–13 | 非 `ps` 部分逐字节一致；`mysplit` 进程状态与参考一致 |
+| trace14–16 | 输出与 `traces/tshref.out` 逐字节一致 |
+
+评测在远端 CentOS 8 x86-64 上做，PID 规格化后与参考实现 `tshref` 的输出对比。
+`tsh.c` 里的注释已全部改成中文（只动注释，剥掉注释后代码与官方 handout 一致）。
 
 这是 CMU CS:APP3e Shell Lab（原 CS 213 Fall 2002 Lab L5）的自学版本，
 在 f15 课程顺序里紧接 Cache Lab 之后。
@@ -135,6 +144,21 @@ PID 每次都不一样，先规格化成 `(PID)`；`make` 回显的驱动命令�
 必然不同，只需保证里面 `mysplit` 进程的状态和参考输出一致。这套流程已经用
 `make rtest-all`（拿参考 shell 自己跑一遍）在远端验证过：除 `ps` 的输出外与
 `traces/tshref.out` 完全一致。
+
+### 坑：trace11–13 要在 tty 下跑
+
+`/bin/ps a` 只列**有控制终端**的进程。用 `ssh order '…'` 这种非交互方式跑
+trace11–13，`ps` 的输出里根本看不到自己的 `tsh` 和 `mysplit`，看着像是进程组
+没建对。要用 `ssh -tt` 分配一个伪终端：
+
+```sh
+ssh -tt order 'cd /root/code/jinduoxia/shlab && make test11 test12 test13; exit'
+```
+
+这时才能看到该看的东西：trace12 停止后有**两个** `./mysplit 4` 处于 `T` 状态
+（父进程和它 fork 出来的子进程都收到了 SIGTSTP），trace11 被 SIGINT 打断后
+两个都消失，trace13 `fg %1` 之后两个都恢复运行并跑完。
+
 
 编译产物（`tsh`、`myspin`、`mysplit`、`mystop`、`myint`、`mine.out`、`ref.out`）
 已在 `.gitignore` 里忽略。

@@ -286,6 +286,11 @@ int builtin_cmd(char **argv)
         return 1;
     }
 
+    if (!strcmp(argv[0], "bg") || !strcmp(argv[0], "fg")) {
+        do_bgfg(argv);
+        return 1;
+    }
+
     return 0;     /* 不是内建命令 */
 }
 
@@ -294,7 +299,52 @@ int builtin_cmd(char **argv)
  */
 void do_bgfg(char **argv) 
 {
-    return;
+    struct job_t *job;
+    char *id = argv[1];        /* 参数是 %jid 或者 pid */
+    pid_t pid;
+
+    if (id == NULL) {
+        printf("%s command requires PID or %%jobid argument\n", argv[0]);
+        return;
+    }
+
+    if (id[0] == '%') {        /* %jid：按作业 ID 找 */
+        if (!isdigit((unsigned char) id[1])) {
+            printf("%s: argument must be a PID or %%jobid\n", argv[0]);
+            return;
+        }
+        job = getjobjid(jobs, atoi(&id[1]));
+        if (job == NULL) {
+            printf("%s: No such job\n", id);
+            return;
+        }
+    }
+    else {                     /* pid：按进程 ID 找 */
+        if (!isdigit((unsigned char) id[0])) {
+            printf("%s: argument must be a PID or %%jobid\n", argv[0]);
+            return;
+        }
+        pid = atoi(id);
+        job = getjobpid(jobs, pid);
+        if (job == NULL) {
+            printf("(%d): No such process\n", pid);
+            return;
+        }
+    }
+
+    /* 先把作业弄醒：SIGCONT 同样发给整个进程组。作业可能本来就在跑
+     * （对已经在运行的作业发 SIGCONT 无害），也可能是停止状态 */
+    if (kill(-(job->pid), SIGCONT) < 0)
+        unix_error("kill error");
+
+    if (!strcmp(argv[0], "bg")) {
+        job->state = BG;       /* 放后台跑，报一行就接着读下一条命令 */
+        printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);
+    }
+    else {
+        job->state = FG;       /* 放前台跑，要等它结束或者被停止 */
+        waitfg(job->pid);
+    }
 }
 
 /* 
