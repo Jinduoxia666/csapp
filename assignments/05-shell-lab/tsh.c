@@ -357,7 +357,19 @@ void sigchld_handler(int sig)
  */
 void sigint_handler(int sig) 
 {
-    return;
+    int olderrno = errno;
+    pid_t pid = fgpid(jobs);
+
+    /* 没有前台作业时这个信号不该有任何效果 */
+    if (pid > 0) {
+        /* 注意是 -pid 不是 pid：发给以 pid 为组 ID 的整个进程组，这样作业
+         * fork 出来的后代进程也会收到。作业自己被杀掉后，内核会给 shell 发
+         * SIGCHLD，"terminated by signal" 的消息由 sigchld_handler 打印 */
+        if (kill(-pid, SIGINT) < 0)
+            unix_error("kill error");
+    }
+
+    errno = olderrno;
 }
 
 /*
@@ -366,7 +378,19 @@ void sigint_handler(int sig)
  */
 void sigtstp_handler(int sig) 
 {
-    return;
+    int olderrno = errno;
+    pid_t pid = fgpid(jobs);
+
+    /* 和 sigint_handler 对称：没有前台作业就什么都不做 */
+    if (pid > 0) {
+        /* 同样发给整个进程组。作业被停止后内核照样会发 SIGCHLD，
+         * 由 sigchld_handler 的 WIFSTOPPED 分支把状态改成 ST 并打印消息，
+         * 作业**不能**从列表里删掉，后面还要靠 bg/fg 把它捞回来 */
+        if (kill(-pid, SIGTSTP) < 0)
+            unix_error("kill error");
+    }
+
+    errno = olderrno;
 }
 
 /*********************
