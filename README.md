@@ -11,7 +11,7 @@
 | 03 | [Attack Lab](assignments/03-attack-lab/README.md) | 已完成 |
 | 04 | [Cache Lab](assignments/04-cache-lab/README.md) | 已完成 |
 | 05 | [Shell Lab](assignments/05-shell-lab/README.md) | 已完成 |
-| 06 | [Malloc Lab](assignments/06-malloc-lab/README.md) | 待做 |
+| 06 | [Malloc Lab](assignments/06-malloc-lab/README.md) | 已完成 |
 | 07 | [Proxy Lab](assignments/07-proxy-lab/README.md) | 待做 |
 
 ## 运行测试
