@@ -1,0 +1,53 @@
+CS:APP Proxy Lab：学生初始文件说明
+==================================
+
+本文件根据官方 handout 的 README 翻译，并补充当前自学目录的使用说明。
+以下路径均相对于 07-proxy-lab/，命令也应在该目录执行。
+
+proxy.c、csapp.h、csapp.c
+    实验初始文件。csapp.c 和 csapp.h 中的辅助函数在教材中有介绍。
+    proxy.c 是代理程序的入口，目前尚未实现代理功能。
+
+    官方允许修改这些文件，也允许新增并提交其他文件。
+    可以使用 port-for-user.pl 或 free-port.sh，为代理和 Tiny 服务器
+    选择测试端口。
+
+Makefile
+    用于构建代理程序：
+        make
+
+    清理后重新构建：
+        make clean
+        make
+
+    官方课程使用 make handin 生成提交压缩包，教师使用提交的 Makefile
+    从源码构建代理。
+
+    当前目录说明：保留的 handin 规则硬编码了 proxylab-handout 目录名，
+    不适用于当前的 07-proxy-lab 目录，暂不要直接使用 make handin。
+
+port-for-user.pl
+    根据用户名生成端口号；同一用户名得到相同结果，端口冲突概率较低。
+    生成的端口 p 为偶数，可将 p 和 p+1 分别用于代理和 Tiny。
+    用法：
+        ./port-for-user.pl <用户名>
+
+free-port.sh
+    查找一个未被使用的 TCP 端口，供代理或 Tiny 使用。
+    用法：
+        ./free-port.sh
+
+driver.sh
+    自动检查基本代理功能、并发处理和缓存功能。
+    用法：
+        ./driver.sh
+
+    官方要求在 Linux 上运行。环境依赖和注意事项见上一级 README.md。
+
+nop-server.py
+    自动评测的辅助程序：接受连接后一直等待而不返回响应，
+    用于检查一个被阻塞的请求是否会妨碍代理处理其他请求。
+
+tiny/
+    教材中的 Tiny Web 服务器，包含静态测试文件和 CGI 示例。
+    详细说明见 tiny/README。

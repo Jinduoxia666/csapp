@@ -1,0 +1,59 @@
+Tiny Web 服务器
+===============
+作者：Dave O’Hallaron
+卡内基梅隆大学
+
+这是 Tiny 教学服务器的目录。它用于卡内基梅隆大学的
+“15-213：计算机系统导论”课程，帮助理解 Web 服务器的基本工作方式。
+
+Tiny 使用 GET 方法处理两类内容：
+
+- 静态内容：从当前目录 ./ 读取文本、HTML、GIF、JPG 等文件并返回。
+- 动态内容：执行 ./cgi-bin/ 中的 CGI 程序，把程序输出返回给客户端。
+
+默认页面是 home.html，而不是 index.html。
+URL 路径由 Tiny 映射到本地文件，不是直接访问操作系统根目录。
+
+Tiny 功能不完整，也不具备生产服务器所需的安全保障，仅用于教学。
+原始说明记录的验证环境为 gcc 2.95.3 和 Linux 2.2.20；这是历史环境。
+当前本机的构建结果见上一级 README.md。
+
+构建
+----
+本实验已经解包，无需再次下载或解压 tiny.tar。
+在 tiny/ 目录执行：
+
+    make
+
+这会构建 Tiny 和 cgi-bin/adder。清理产物使用：
+
+    make clean
+
+运行
+----
+在 tiny/ 目录启动服务器，并指定监听端口，例如：
+
+    ./tiny 8000
+
+然后在浏览器中访问：
+
+    静态页面：http://localhost:8000/
+    动态加法：http://localhost:8000/cgi-bin/adder?1&2
+
+若浏览器运行在另一台机器上，将 localhost 换成服务器的主机名或 IP。
+动态示例会运行 adder 程序，计算 1 + 2 并生成响应页面。
+
+文件说明
+--------
+tiny.c              Tiny 服务器源码
+csapp.c、csapp.h     教材辅助函数及声明
+Makefile            Tiny 与 CGI 示例的构建脚本
+home.html           测试 HTML 页面
+godzilla.gif        home.html 中引用的图片
+godzilla.jpg        图片测试文件
+README              本说明文件
+cgi-bin/adder.c     将两个数相加的 CGI 示例
+cgi-bin/Makefile    adder 的构建脚本
+
+官方原始说明还列出了 tiny.tar；本实验使用完整的 Proxy Lab handout
+提供这些文件，当前目录不重复保存 tiny.tar。

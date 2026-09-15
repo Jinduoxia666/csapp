@@ -1,0 +1,5 @@
+/proxy
+/tiny/tiny
+/tiny/cgi-bin/adder
+/.proxy/
+/.noproxy/
