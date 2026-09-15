@@ -10,14 +10,23 @@ LDFLAGS = -lpthread
 
 all: proxy
 
+.PHONY: all test clean
+
+# 验证转发、并发和缓存行为，不运行官方评分。
+test: proxy
+	python3 tools/test-part1.py
+
 csapp.o: csapp.c csapp.h
 	$(CC) $(CFLAGS) -c csapp.c
 
-proxy.o: proxy.c csapp.h
+cache.o: cache.c cache.h
+	$(CC) $(CFLAGS) -c cache.c
+
+proxy.o: proxy.c csapp.h cache.h
 	$(CC) $(CFLAGS) -c proxy.c
 
-proxy: proxy.o csapp.o
-	$(CC) $(CFLAGS) proxy.o csapp.o -o proxy $(LDFLAGS)
+proxy: proxy.o csapp.o cache.o
+	$(CC) $(CFLAGS) proxy.o csapp.o cache.o -o proxy $(LDFLAGS)
 
 # 在上一级目录生成用于提交的 proxylab-handin.tar 压缩包。
 # 不要修改此提交规则！
@@ -26,4 +35,3 @@ handin:
 
 clean:
 	rm -f *~ *.o proxy core *.tar *.zip *.gzip *.bzip *.gz
-

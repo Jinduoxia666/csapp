@@ -6,11 +6,14 @@ CS:APP Proxy Lab：学生初始文件说明
 
 proxy.c、csapp.h、csapp.c
     实验初始文件。csapp.c 和 csapp.h 中的辅助函数在教材中有介绍。
-    proxy.c 是代理程序的入口，目前尚未实现代理功能。
+    proxy.c 是代理程序的入口，目前已实现转发、多线程并发和缓存三个部分。
 
     官方允许修改这些文件，也允许新增并提交其他文件。
     可以使用 port-for-user.pl 或 free-port.sh，为代理和 Tiny 服务器
     选择测试端口。
+
+cache.c、cache.h
+    新增的并发缓存模块，提供查询、插入、容量限制和近似 LRU 淘汰。
 
 Makefile
     用于构建代理程序：
