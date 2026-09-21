@@ -1,6 +1,6 @@
 # 作业 07：Proxy Lab
 
-状态：**Part I、Part II、Part III 均已实现并通过本地测试**；Linux 官方评分尚未运行。
+状态：**已完成**（Part I、Part II、Part III 均已实现并通过本地测试）；Linux 官方评分尚未运行。
 
 这是 CMU CS:APP3e / 15-213 Fall 2015 Proxy Lab 的自学版本，
 在 f15 课程顺序里紧接 Malloc Lab 之后，是本课程的最后一个实验。
